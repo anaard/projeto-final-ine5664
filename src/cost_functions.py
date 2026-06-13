@@ -129,3 +129,40 @@ class CategoricalCrossEntropy(Loss):
     def gradient(self, predictions: np.ndarray, targets: np.ndarray) -> np.ndarray:
         """Retorna o gradiente da CCE em relação às predições."""
         return predictions - targets
+
+
+_LOSSES: dict = {
+    "mse": MeanSquaredError,
+    "binary_crossentropy": BinaryCrossEntropy,
+    "categorical_crossentropy": CategoricalCrossEntropy,
+}
+
+
+def get_loss(name) -> Loss:
+    """
+    Instancia uma função de custo a partir de seu nome ou instância.
+
+    Parâmetros:
+        name (str ou Loss): Nome da função de custo ('mse', 'binary_crossentropy',
+        'categorical_crossentropy') ou uma instância de Loss já criada.
+
+    Retorna:
+        Loss: Instância da função de custo.
+
+    Raises:
+        TypeError: Se ``name`` não for ``str`` nem ``Loss``.
+        ValueError: Se o nome não corresponder a nenhuma função registrada.
+    """
+    if isinstance(name, Loss):
+        return name
+    if not isinstance(name, str):
+        raise TypeError(
+            f"'name' deve ser str ou Loss, recebido: {type(name).__name__}."
+        )
+    key = name.lower().strip()
+    if key not in _LOSSES:
+        valid = list(_LOSSES.keys())
+        raise ValueError(
+            f"Função de custo '{name}' não encontrada. Opções válidas: {valid}"
+        )
+    return _LOSSES[key]()

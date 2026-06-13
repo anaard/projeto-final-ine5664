@@ -256,3 +256,45 @@ class Linear(Activation):
     def backward(self, pre_activation: np.ndarray) -> np.ndarray:
         """Retorna a derivada da função linear (1)."""
         return np.ones_like(pre_activation)
+
+
+_ACTIVATIONS: dict = {
+    "relu": ReLU,
+    "sigmoid": Sigmoid,
+    "tanh": Tanh,
+    "leaky_relu": LeakyReLU,
+    "elu": ELU,
+    "selu": SELU,
+    "softmax": Softmax,
+    "linear": Linear,
+}
+
+
+def get_activation(name, **kwargs) -> Activation:
+    """
+    Instancia uma função de ativação a partir de seu nome ou instância.
+
+    Parâmetros:
+        name (str ou Activation): Nome da ativação ('relu', 'sigmoid', 'tanh',
+        'leaky_relu', 'elu', 'selu', 'softmax', 'linear') ou uma instância de Activation já criada.
+        **kwargs: Parâmetros extras passados ao construtor (ex.: alpha=0.1 para LeakyReLU ou ELU).
+
+    Retorna:
+        Activation: Instância da função de ativação.
+
+    Raises:
+        TypeError: Se name não for str nem Activation.
+        ValueError: Se o nome não corresponder a nenhuma ativação registrada.
+    """
+    if isinstance(name, Activation):
+        return name
+    if not isinstance(name, str):
+        raise TypeError(
+            f"'name' deve ser str ou Activation, recebido: {type(name).__name__}."
+        )
+
+    key = name.lower().strip()
+    if key not in _ACTIVATIONS:
+        valid = list(_ACTIVATIONS.keys())
+        raise ValueError(f"Ativação '{name}' não encontrada. Opções válidas: {valid}")
+    return _ACTIVATIONS[key](**kwargs)

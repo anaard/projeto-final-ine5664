@@ -118,3 +118,41 @@ class ZeroInitializer(Initializer):
 
     def initialize(self, shape: tuple[int, int]) -> np.ndarray:
         return np.zeros(shape)
+
+
+_INITIALIZERS: dict = {
+    "xavier": XavierInitializer,
+    "he": HeInitializer,
+    "random_normal": RandomNormalInitializer,
+    "zero": ZeroInitializer,
+}
+
+
+def get_initializer(name) -> Initializer:
+    """
+    Instancia um inicializador a partir de seu nome ou instância.
+
+    Parâmetros:
+        name (str ou Initializer): Nome do inicializador ('xavier', 'he', 'random_normal', 'zero')
+        ou uma instância de Initializer já criada.
+
+    Retorna:
+        Initializer: Instância de inicializador.
+
+    Raises:
+        TypeError: Se ``name`` não for ``str`` nem ``Initializer``.
+        ValueError: Se o nome não corresponder a nenhum inicializador registrado.
+    """
+    if isinstance(name, Initializer):
+        return name
+    if not isinstance(name, str):
+        raise TypeError(
+            f"'name' deve ser str ou Initializer, recebido: {type(name).__name__}."
+        )
+    key = name.lower().strip()
+    if key not in _INITIALIZERS:
+        valid = list(_INITIALIZERS.keys())
+        raise ValueError(
+            f"Inicializador '{name}' não encontrado. Opções válidas: {valid}"
+        )
+    return _INITIALIZERS[key]()
