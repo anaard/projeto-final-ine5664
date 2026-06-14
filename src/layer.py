@@ -2,12 +2,25 @@
 
 from dataclasses import dataclass
 import numpy as np
-from .activations import Activation, get_activation
+from .activations import (
+    Activation,
+    get_activation,
+    ReLU,
+    LeakyReLU,
+    ELU,
+    SELU,
+    Sigmoid,
+    Tanh,
+    Softmax,
+    Linear,
+)
 from .initializers import (
     Initializer,
     get_initializer,
     RandomNormalInitializer,
     ZeroInitializer,
+    XavierInitializer,
+    HeInitializer,
 )
 
 
@@ -34,8 +47,8 @@ class Layer:
         input_size: int,
         output_size: int,
         activation: Activation | str,
-        weight_initializer: Initializer | str = RandomNormalInitializer(),
-        bias_initializer: Initializer | str = ZeroInitializer(),
+        weight_initializer: Initializer | str | None = None,
+        bias_initializer: Initializer | str | None = None,
     ) -> None:
         """Inicializa a camada e seus parâmetros treináveis.
 
@@ -51,8 +64,24 @@ class Layer:
         self.__output_size = output_size
         self.__activation = get_activation(activation)
 
-        weight_init = get_initializer(weight_initializer)
-        bias_init = get_initializer(bias_initializer)
+        if weight_initializer is None:
+            if isinstance(self.__activation, (ReLU, ELU, LeakyReLU, SELU)):
+                weight_init = HeInitializer()
+
+            elif isinstance(self.__activation, (Sigmoid, Tanh, Softmax, Linear)):
+                weight_init = XavierInitializer()
+
+            else:
+                weight_init = RandomNormalInitializer()
+
+        else:
+            weight_init = get_initializer(weight_initializer)
+
+        if bias_initializer is None:
+            bias_init = ZeroInitializer()
+        else:
+            bias_init = get_initializer(bias_initializer)
+
         self.__weights = weight_init.initialize((input_size, output_size))
         self.__biases = bias_init.initialize((1, output_size))
 
