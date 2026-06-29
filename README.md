@@ -77,23 +77,16 @@ model.fit(X_train, y_train, epochs=500, batch_size=32)
 predictions = model.predict(X_test)
 ```
 
-### Early Stopping e Histórico
+## Execução dos Jupyter Notebooks
 
-```python
-model.fit(
-    X_train, y_train,
-    epochs=1000,
-    batch_size=32,
-    validation_split=0.2,
-    patience=20,       # Interrompe após 20 épocas sem melhora
-    min_delta=1e-4,    # Melhora mínima para ser considerada progresso
-)
- 
-# Acessar histórico de perdas
-print(model.history.epochs)
-print(model.history.losses)
-print(model.history.eval_losses)  # Disponível se validation_data foi fornecido
-```
+Os exemplos completos de treinamento e avaliação dos modelos estão disponíveis no diretório `notebooks/`.
+
+Para executá-los no `Visual Studio Code`:
+1. Abra a pasta raiz do projeto no `VS Code`.
+2. Instale as dependências do projeto com: `pip install -r requirements.txt`
+3. Abra o notebook desejado na pasta `notebooks/`.
+4. Selecione um *kernel* Python correspondente ao ambiente em que as dependências foram instaladas.
+5. Execute as células na ordem em que aparecem.
 
 ---
 
@@ -136,13 +129,13 @@ print(model.history.eval_losses)  # Disponível se validation_data foi fornecido
 ## Estrutura do Projeto
 
 ```
-ine5664-projeto-final
+projeto-final-ine5664
 ├── datasets/                           # Conjuntos de dados para treinamento.
 │   ├── star_classification.csv         # - Classificação Multiclasse
 │   ├── student_habits_performance.csv  # - Regressão
 │   └── Titanic-Dataset.csv             # - Classificação Binária
 ├── images/                             # Diagramas e imagens relacionados.
-│   ├── achitecture.png
+│   └── achitecture.png
 ├── notebooks/                          # Jupyter Notebooks utilizados em demonstrações práticas.
 │   ├── binary_classification.ipynb
 │   ├── multiclass_classification.ipynb
