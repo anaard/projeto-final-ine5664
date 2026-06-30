@@ -9,15 +9,10 @@ from .activations import (
     LeakyReLU,
     ELU,
     SELU,
-    Sigmoid,
-    Tanh,
-    Softmax,
-    Linear,
 )
 from .initializers import (
     Initializer,
     get_initializer,
-    RandomNormalInitializer,
     ZeroInitializer,
     XavierInitializer,
     HeInitializer,
@@ -119,8 +114,6 @@ class Layer:
         Retorna:
             :class:`LayerGradients` com os gradientes em relação a x, W e b.
         """
-        m = self.__x.shape[0]
-
         grad_z = grad_y * self.__activation.backward(self.__z)
         grad_w = self.__x.T @ grad_z
         grad_b = np.sum(grad_z, axis=0, keepdims=True)
