@@ -195,7 +195,7 @@ class SELU(Activation):
     ALPHA: float = 1.67326
 
     def forward(self, pre_activation: np.ndarray) -> np.ndarray:
-        """Aplica a SELU elemento a elemento de forma otimizada."""
+        """Aplica a SELU elemento a elemento de forma estável."""
         result = pre_activation.copy()
 
         neg_mask = pre_activation < 0.0
