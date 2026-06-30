@@ -50,7 +50,7 @@ class MeanSquaredError(Loss):
     Normalmente usada para tarefas de regressão.
 
     Função: 1/m * sum[i=1..m] (y_i - ŷ_i)^2
-    Derivada: 2 * (ŷ_i - y_i)
+    Derivada: 2 * (ŷ_i - y_i) / m
     """
 
     def compute(self, predictions: np.ndarray, targets: np.ndarray) -> float:
@@ -59,7 +59,7 @@ class MeanSquaredError(Loss):
 
     def gradient(self, predictions: np.ndarray, targets: np.ndarray) -> np.ndarray:
         """Retorna o gradiente do MSE em relação às predições."""
-        return 2.0 * (predictions - targets)
+        return 2.0 * (predictions - targets) / predictions.shape[0]
 
 
 # Constante para evitar log(0) e divisão por zero
@@ -73,7 +73,7 @@ class BinaryCrossEntropy(Loss):
 
     Função: - 1/m * sum[i=1..m] [y_i * ln(ŷ_i) + (1 - y_i) * ln(1 - ŷ_i)]
 
-    Derivada: (ŷ - y) / ŷ * (1 - ŷ)
+    Derivada: ((ŷ - y) / ŷ * (1 - ŷ)) / m
     """
 
     def compute(self, predictions: np.ndarray, targets: np.ndarray) -> float:
@@ -86,7 +86,7 @@ class BinaryCrossEntropy(Loss):
     def gradient(self, predictions: np.ndarray, targets: np.ndarray) -> np.ndarray:
         """Retorna o gradiente da BCE em relação às predições."""
         prob = np.clip(predictions, _EPSILON, 1.0 - _EPSILON)
-        return (prob - targets) / (prob * (1.0 - prob))
+        return ((prob - targets) / (prob * (1.0 - prob))) / predictions.shape[0]
 
 
 class CategoricalCrossEntropy(Loss):
@@ -97,7 +97,7 @@ class CategoricalCrossEntropy(Loss):
     Função: - 1/m * sum[i=1..m] sum[c=1..C] y_ic * ln(ŷ_ic)
 
     Derivada combinada (CCE + Softmax):
-        dL/dz = (ŷ - y)
+        dL/dz = (ŷ - y)/m
 
     Observação:
         O gradiente implementado não é o da CCE isolada (-(y/ŷ) / m), mas sim
@@ -128,7 +128,7 @@ class CategoricalCrossEntropy(Loss):
 
     def gradient(self, predictions: np.ndarray, targets: np.ndarray) -> np.ndarray:
         """Retorna o gradiente da CCE em relação às predições."""
-        return predictions - targets
+        return (predictions - targets) / predictions.shape[0]
 
 
 _LOSSES: dict = {

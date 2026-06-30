@@ -67,13 +67,8 @@ class Layer:
         if weight_initializer is None:
             if isinstance(self.__activation, (ReLU, ELU, LeakyReLU, SELU)):
                 weight_init = HeInitializer()
-
-            elif isinstance(self.__activation, (Sigmoid, Tanh, Softmax, Linear)):
-                weight_init = XavierInitializer()
-
             else:
-                weight_init = RandomNormalInitializer()
-
+                weight_init = XavierInitializer()
         else:
             weight_init = get_initializer(weight_initializer)
 
@@ -127,8 +122,8 @@ class Layer:
         m = self.__x.shape[0]
 
         grad_z = grad_y * self.__activation.backward(self.__z)
-        grad_w = self.__x.T @ grad_z / m
-        grad_b = np.sum(grad_z, axis=0, keepdims=True) / m
+        grad_w = self.__x.T @ grad_z
+        grad_b = np.sum(grad_z, axis=0, keepdims=True)
         grad_x = grad_z @ self.__weights.T
 
         return LayerGradients(grad_x, grad_w, grad_b)
