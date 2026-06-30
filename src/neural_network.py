@@ -94,6 +94,12 @@ class NeuralNetwork:
         """
         self.__validate_output_activation()
 
+        rng = np.random.default_rng(seed)
+        num_samples = inputs.shape[0]
+        idx = rng.permutation(num_samples)
+        inputs = inputs[idx]
+        targets = targets[idx]
+
         # Separar dados de validação
         if validation_data is not None:
             val_inputs, val_targets = validation_data
@@ -105,15 +111,13 @@ class NeuralNetwork:
 
         has_validation = validation_data is not None
 
-        num_samples = inputs.shape[0]
         effective_batch = num_samples if batch_size is None else batch_size
 
         best_eval_loss = float("inf")
         patience_counter = 0
 
-        rng = np.random.default_rng(seed)
         for epoch in range(epochs):
-            epoch_loss = self.__epoch(inputs, targets, effective_batch, rng)
+            epoch_loss = self.__epoch(inputs, targets, effective_batch)
 
             self.__history.epochs.append(epoch + 1)
             self.__history.losses.append(epoch_loss)
@@ -143,7 +147,6 @@ class NeuralNetwork:
         inputs: np.ndarray,
         targets: np.ndarray,
         batch_size: int,
-        rng: np.random.Generator,
     ) -> float:
         """Executa uma época completa com mini-batches embaralhados.
 
@@ -151,21 +154,16 @@ class NeuralNetwork:
             inputs: Dataset de entrada completo.
             targets: Rótulos completos.
             batch_size: Tamanho do mini-batch.
-            rng: Gerador de números aleatórios para o embaralhamento.
 
         Retorna:
             Perda (loss) média da época.
         """
         num_samples = inputs.shape[0]
 
-        idx = rng.permutation(num_samples)
-        data_s = inputs[idx]
-        targets_s = targets[idx]
-
         losses = []
         for start in range(0, num_samples, batch_size):
-            batch_inputs = data_s[start : start + batch_size]
-            batch_targets = targets_s[start : start + batch_size]
+            batch_inputs = inputs[start : start + batch_size]
+            batch_targets = targets[start : start + batch_size]
             predictions = self.__feed_forward(batch_inputs)
             losses.append(self.__cost_function.compute(predictions, batch_targets))
             gradients = self.__back_propagation(predictions, batch_targets)
